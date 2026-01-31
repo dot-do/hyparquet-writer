@@ -64,6 +64,7 @@ export function createShreddedVariantColumn(name, values, shredFields, options =
  * @returns {Record<string, { parquetType: string, convertedType?: string }>}
  */
 function detectFieldTypes(values, fields, overrides) {
+  /** @type {Record<string, { parquetType: string, convertedType?: string }>} */
   const types = {}
 
   for (const field of fields) {
@@ -169,64 +170,66 @@ function parseTypeOverride(typeStr) {
  * @returns {import('hyparquet').SchemaElement[]}
  */
 function buildShreddedSchema(name, shredFields, fieldTypes, nullable) {
+  /** @type {import('hyparquet').SchemaElement[]} */
   const schema = []
 
   // Root VARIANT group
   // num_children = 3 (metadata, value, typed_value)
-  schema.push({
+  schema.push(/** @type {import('hyparquet').SchemaElement} */ ({
     name,
     repetition_type: nullable ? 'OPTIONAL' : 'REQUIRED',
     num_children: 3,
     logical_type: { type: 'VARIANT' },
-  })
+  }))
 
   // metadata (required binary)
-  schema.push({
+  schema.push(/** @type {import('hyparquet').SchemaElement} */ ({
     name: 'metadata',
     type: 'BYTE_ARRAY',
     repetition_type: 'REQUIRED',
-  })
+  }))
 
   // value (optional binary) - null when fully shredded
-  schema.push({
+  schema.push(/** @type {import('hyparquet').SchemaElement} */ ({
     name: 'value',
     type: 'BYTE_ARRAY',
     repetition_type: 'OPTIONAL',
-  })
+  }))
 
   // typed_value group containing shredded fields
-  schema.push({
+  schema.push(/** @type {import('hyparquet').SchemaElement} */ ({
     name: 'typed_value',
     repetition_type: 'OPTIONAL',
     num_children: shredFields.length,
-  })
+  }))
 
   // Each shredded field is a group with value + typed_value
   for (const field of shredFields) {
     const fieldType = fieldTypes[field]
 
     // Field group
-    schema.push({
+    schema.push(/** @type {import('hyparquet').SchemaElement} */ ({
       name: field,
       repetition_type: 'OPTIONAL',
       num_children: 2,
-    })
+    }))
 
     // value (binary) - null for typed values
-    schema.push({
+    schema.push(/** @type {import('hyparquet').SchemaElement} */ ({
       name: 'value',
       type: 'BYTE_ARRAY',
       repetition_type: 'OPTIONAL',
-    })
+    }))
 
     // typed_value - the actual typed column with statistics
+    /** @type {import('hyparquet').SchemaElement} */
     const typedValueSchema = {
       name: 'typed_value',
-      type: fieldType.parquetType,
+      type: /** @type {import('hyparquet').ParquetType} */ (fieldType.parquetType),
       repetition_type: 'OPTIONAL',
     }
     if (fieldType.convertedType) {
-      typedValueSchema.converted_type = fieldType.convertedType
+      typedValueSchema.converted_type = /** @type {import('hyparquet').ConvertedType} */ (fieldType.convertedType)
     }
     schema.push(typedValueSchema)
   }
@@ -278,6 +281,7 @@ function extractColumnData(name, values, shredFields) {
     }
 
     // Build object WITHOUT shredded fields for the value column
+    /** @type {Record<string, any>} */
     const remaining = {}
     let hasRemaining = false
     for (const [k, v] of Object.entries(value)) {

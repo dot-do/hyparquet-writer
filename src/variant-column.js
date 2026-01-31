@@ -40,23 +40,24 @@ export function createVariantColumn(name, values, options = {}) {
   })
 
   // Create schema for VARIANT group
+  /** @type {import('hyparquet').SchemaElement[]} */
   const schema = [
-    {
+    /** @type {import('hyparquet').SchemaElement} */ ({
       name,
       repetition_type: nullable ? 'OPTIONAL' : 'REQUIRED',
       num_children: 2,
       logical_type: { type: 'VARIANT' },
-    },
-    {
+    }),
+    /** @type {import('hyparquet').SchemaElement} */ ({
       name: 'metadata',
       type: 'BYTE_ARRAY',
       repetition_type: 'REQUIRED',
-    },
-    {
+    }),
+    /** @type {import('hyparquet').SchemaElement} */ ({
       name: 'value',
       type: 'BYTE_ARRAY',
       repetition_type: 'OPTIONAL',
-    },
+    }),
   ]
 
   return {

@@ -19,7 +19,9 @@ const encoder = new TextEncoder()
  */
 export function encodeVariant(value) {
   // Build string dictionary from all object keys
+  /** @type {string[]} */
   const dictionary = []
+  /** @type {Map<string, number>} */
   const dictIndex = new Map()
   collectStrings(value, dictionary, dictIndex)
 
@@ -341,7 +343,7 @@ function encodeArray(value, dictIndex) {
 /**
  * Encode an object.
  *
- * @param {object} value
+ * @param {Record<string, any>} value
  * @param {Map<string, number>} dictIndex
  * @returns {Uint8Array}
  */
