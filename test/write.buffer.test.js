@@ -72,7 +72,7 @@ describe('parquetWriteBuffer', () => {
   it('efficiently serializes long string', () => {
     const str = 'a'.repeat(10000)
     const file = parquetWriteBuffer({ columnData: [{ name: 'string', data: [str] }] })
-    expect(file.byteLength).toBe(638)
+    expect(file.byteLength).toBe(639) // 1 byte more for correct total_uncompressed_size encoding
   })
 
   it('less efficiently serializes string without compression', () => {
@@ -87,7 +87,7 @@ describe('parquetWriteBuffer', () => {
       .fill('aaaa', 0, 50000)
       .fill('bbbb', 50000, 100000)
     const file = parquetWriteBuffer({ columnData: [{ name: 'string', data }], statistics: false, rowGroupSize: 100000 })
-    expect(file.byteLength).toBe(170)
+    expect(file.byteLength).toBe(169) // Correct total_uncompressed_size encoding
     // round trip
     const result = await parquetReadObjects({ file })
     expect(result.length).toBe(100000)

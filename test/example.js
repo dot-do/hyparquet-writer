@@ -38,7 +38,7 @@ export const exampleMetadata = {
           path_in_schema: ['bool'],
           codec: 'SNAPPY',
           num_values: 4n,
-          total_uncompressed_size: 24n,
+          total_uncompressed_size: 22n,
           total_compressed_size: 24n,
           data_page_offset: 4n,
           statistics: {
@@ -56,7 +56,7 @@ export const exampleMetadata = {
           path_in_schema: ['int'],
           codec: 'SNAPPY',
           num_values: 4n,
-          total_uncompressed_size: 39n,
+          total_uncompressed_size: 37n,
           total_compressed_size: 39n,
           data_page_offset: 28n,
           statistics: {
@@ -74,7 +74,7 @@ export const exampleMetadata = {
           path_in_schema: ['bigint'],
           codec: 'SNAPPY',
           num_values: 4n,
-          total_uncompressed_size: 43n,
+          total_uncompressed_size: 53n,
           total_compressed_size: 43n,
           data_page_offset: 67n,
           statistics: {
@@ -92,7 +92,7 @@ export const exampleMetadata = {
           path_in_schema: ['float'],
           codec: 'SNAPPY',
           num_values: 4n,
-          total_uncompressed_size: 39n,
+          total_uncompressed_size: 37n,
           total_compressed_size: 39n,
           data_page_offset: 110n,
           statistics: {
@@ -110,7 +110,7 @@ export const exampleMetadata = {
           path_in_schema: ['double'],
           codec: 'SNAPPY',
           num_values: 4n,
-          total_uncompressed_size: 51n,
+          total_uncompressed_size: 53n,
           total_compressed_size: 51n,
           data_page_offset: 149n,
           statistics: {
@@ -128,7 +128,7 @@ export const exampleMetadata = {
           path_in_schema: ['string'],
           codec: 'SNAPPY',
           num_values: 4n,
-          total_uncompressed_size: 42n,
+          total_uncompressed_size: 41n,
           total_compressed_size: 42n,
           data_page_offset: 200n,
           statistics: {
@@ -146,7 +146,7 @@ export const exampleMetadata = {
           path_in_schema: ['nullable'],
           codec: 'SNAPPY',
           num_values: 4n,
-          total_uncompressed_size: 26n,
+          total_uncompressed_size: 24n,
           total_compressed_size: 26n,
           data_page_offset: 242n,
           statistics: {

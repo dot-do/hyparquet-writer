@@ -34,6 +34,9 @@ export function writeColumn({ writer, column, values, pageData }) {
   let dictionary_page_offset
   let data_page_offset = BigInt(writer.offset)
   const dictionary = useDictionary(values, type, userEncoding)
+  // Track the difference between uncompressed and compressed data sizes
+  // total_uncompressed_size = total_compressed_size + compressionDelta
+  let compressionDelta = 0
 
   // Determine encoding and prepare values for writing
   /** @type {Encoding} */
@@ -53,7 +56,8 @@ export function writeColumn({ writer, column, values, pageData }) {
     // write dictionary page first
     dictionary_page_offset = BigInt(writer.offset)
     const unconverted = unconvert(element, dictionary)
-    writeDictionaryPage(writer, column, unconverted)
+    const dictDelta = writeDictionaryPage(writer, column, unconverted)
+    compressionDelta += dictDelta
   } else {
     // unconvert values from rich types to simple
     writeValues = unconvert(element, values)
@@ -89,7 +93,8 @@ export function writeColumn({ writer, column, values, pageData }) {
     const chunk = createPageChunk(writeValues, pageData, start, end)
     const pageOffset = writer.offset
 
-    writeDataPageV2({ writer, column, encoding, ...chunk })
+    const { compressionDelta: pageDelta } = writeDataPageV2({ writer, column, encoding, ...chunk })
+    compressionDelta += pageDelta
 
     // Track page info for indexes
     const pageRows = BigInt(end - start)
@@ -139,7 +144,7 @@ export function writeColumn({ writer, column, values, pageData }) {
         codec: column.codec ?? 'UNCOMPRESSED',
         num_values: BigInt(num_values),
         total_compressed_size: BigInt(writer.offset - offsetStart),
-        total_uncompressed_size: BigInt(writer.offset - offsetStart), // TODO
+        total_uncompressed_size: BigInt(writer.offset - offsetStart + compressionDelta),
         data_page_offset,
         dictionary_page_offset,
         statistics,
@@ -261,6 +266,7 @@ function useDictionary(values, type, encoding) {
  * @param {Writer} writer
  * @param {ColumnEncoder} column
  * @param {DecodedArray} dictionary
+ * @returns {number} compression delta (uncompressed - compressed)
  */
 function writeDictionaryPage(writer, column, dictionary) {
   const { element, codec, compressors } = column
@@ -290,6 +296,7 @@ function writeDictionaryPage(writer, column, dictionary) {
     },
   })
   writer.appendBuffer(compressedDictionaryPage.getBuffer())
+  return dictionaryPage.offset - compressedDictionaryPage.offset
 }
 
 /**
